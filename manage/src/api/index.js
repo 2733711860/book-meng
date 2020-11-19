@@ -1,36 +1,44 @@
 /**
- * Created by chenyb on 22/10/18.
  * API命名配置列表
  * 命名规则：驼峰式命名方式，动词放前面，名词放后面，
  * 如:addFeatures
  * API命名变量不要太过长
  */
-import config from '../config'
-let baseUrl
-switch (process.env.NODE_ENV) {
-  // 生产环境
-  case 'production':
-    baseUrl = config.baseUrl.pro
-    break
-  // 预生产环境
-  case 'testing':
-    baseUrl = config.baseUrl.tes
-    break
-  default:
-    // 开发环境或测试环境
-    baseUrl = config.baseUrl.dev
-    break
-}
-export { baseUrl }
-export default {
-  // **系统管理**开始
-  login: baseUrl + '/api/user/login', // 用户登陆
-  getCheckCode: baseUrl + '/api/other/getCheckCode', // 获取验证码
-  register: baseUrl + '/api/user/register', // 注册
-  improve: baseUrl + '/api/user/improve', // 用户信息完善
-  upload: baseUrl + '/api/file/upload', // 头像上传接口
-  imageUpload: baseUrl + '/api/file/image/upload', // 图片上传
-  getClassify: baseUrl + '/api/file/image/getClassify', // 获取图片分类
-  search: baseUrl + '/api/image/search', // 图片查询
-  getWordImage: baseUrl + '/api/getWordImage',
-}
+import { get, post } from './http.js'
+
+// export const baseUrl = `http://121.41.79.10:8080/api`
+export const baseUrl = `http://localhost:8080/api`
+// export const baseUrl = 'https://www.fastmock.site/mock/f5b0436d25760cd9e4b88fdf3de4d459/api'
+
+
+export const getBookByAuthor = params => get(`${baseUrl}/search/authorbook`, params) // 根据作者查询书籍
+
+export const getBookByRandom = params => get(`${baseUrl}/search/randombook`, params) // 随机获取几本书籍
+
+export const getBookByRank = params => get(`${baseUrl}/search/rankbook`, params) // 获取排行榜书籍
+
+export const getBookByType = params => get(`${baseUrl}/search/typebook`, params) // 根据分类获取书籍
+
+export const getBookByWord = params => get(`${baseUrl}/search/wordbook`, params) // 根据关键字查询书籍
+
+export const getBookChapter = params => get(`${baseUrl}/get/chapter`, params) // 获取章节
+
+export const getCrawlChapter = params => get(`${baseUrl}/crawl/chapter`, params) // 爬取章节
+
+export const getHotWord = params => get(`${baseUrl}/search/hotWord`, params) // 获取搜索热词
+
+export const getBookDetail = params => get(`${baseUrl}/crawl/detail`, params) // 获取书籍详情
+
+export const getBookContent = params => get(`${baseUrl}/crawl/content`, params) // 获取正文
+
+export const crawlBookTosql = params => get(`${baseUrl}/crawl/book`, params) // 爬取书籍到数据库
+
+export const crawlDetailsTosql = params => get(`${baseUrl}/crawl/alldetail`, params) // 从数据库获取bookId，批量爬取书籍详情并保存到数据库（阅读器用不到）
+
+
+// 用户
+export const getCheckCode = params => get(`${baseUrl}/get/checkcode`, params) // 获取验证码
+
+export const register = params => post(`${baseUrl}/user/register`, params) // 注册
+
+export const login = params => post(`${baseUrl}/user/login`, params) // 注册

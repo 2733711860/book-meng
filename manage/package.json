@@ -26,6 +26,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.9.0",
     "@vue/cli-service": "^3.9.0",
+    "qs": "^6.9.4",
     "vue-template-compiler": "^2.6.10"
   }
 }

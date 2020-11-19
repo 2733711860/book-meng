@@ -3,7 +3,7 @@ export default {
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': null
   },
-  timeout: 50000,
+  timeout: 30000,
   emulateJSON: true,
 
   withCredentials: false,

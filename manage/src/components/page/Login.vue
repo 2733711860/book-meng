@@ -72,6 +72,7 @@
 <script>
 	import lrz from "lrz"
 	import { mapMutations, mapActions, mapGetters } from 'vuex'
+	import { getCheckCode, register, login } from '../../api/index.js'
 	export default {
 		data: function() {
 			return {
@@ -138,7 +139,7 @@
 		},
 		methods: {
 			async getCheckcode () {
-				await this.$get(this.$api.getCheckCode).then(data => {
+				getCheckCode().then(data => {
 					this.checkSrc = data.data.imgSrc
 					this.code_token = data.data.token
 		    })
@@ -162,7 +163,7 @@
 					checkCode: this.loginParam.checkcode,
 					code_token: this.code_token
 				}
-				await this.$post(this.$api.login, param).then(data => {
+				login(param).then(data => {
 					if (data.code == 200) {
 						this.setUser(data.data.userMsg[0])
 						this.$router.push('/');
@@ -195,7 +196,7 @@
 					checkCode: this.logoutParam.checkcode,
 					code_token: this.code_token
 				}
-				await this.$post(this.$api.register, param).then(data => {
+				register(param).then(data => {
 					if (data.code == 200) {
 						this.setUser(data.data.userMsg)
 						this.$router.push('/');

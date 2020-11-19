@@ -14,8 +14,9 @@ app.use(cors({
 }));
 
 const router = require('./router/router');
-app.use(router.routes());
-app.use(router.allowedMethods());
+app.use(router.routes(), router.allowedMethods(), (err)=> {
+  console.log(err)
+});
 
 const { listenPort, listenHost } = require('./config');
 app.listen(listenPort, listenHost, () => {

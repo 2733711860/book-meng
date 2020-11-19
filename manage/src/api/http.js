@@ -1,20 +1,23 @@
 import axios from 'axios';
 import config from './config'
 import { Message } from 'element-ui'
+import qs from 'qs'
 
 //http request 拦截器
 axios.interceptors.request.use(
   config => {
-    // if(token){
-    //   config.params = {'token':token}
-    // }
+    if (config.method === 'get') {
+    	// 如果是get请求，且params是数组类型如arr=[1,2]，则转换成arr=1&arr=2,不转换会显示为arr[]=1&arr[]=2
+    	config.paramsSerializer = function(params) {
+    		return qs.stringify(params, { arrayFormat: 'repeat' })
+    	}
+    }
     return config;
   },
   error => {
     return Promise.reject(err);
   }
 );
-
 
 //http response 拦截器
 axios.interceptors.response.use(
@@ -28,10 +31,6 @@ axios.interceptors.response.use(
     return response;
   },
   error => {
-  	Message({
-      message: '网络异常，请稍后再试！',
-      type: 'error'
-    });
     return Promise.reject(error)
   }
 )

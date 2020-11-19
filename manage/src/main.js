@@ -11,15 +11,6 @@ import './components/common/directives';
 import 'babel-polyfill';
 import store from './store'; // vuex
 
-// 接口请求
-import {post,get,patch,put} from './api/http.js'
-import api from './api'
-Vue.prototype.$post=post;
-Vue.prototype.$get=get;
-Vue.prototype.$patch=patch;
-Vue.prototype.$put=put;
-Vue.prototype.$api=api;
-
 Vue.config.productionTip = false;
 Vue.use(VueI18n);
 Vue.use(ElementUI, {
