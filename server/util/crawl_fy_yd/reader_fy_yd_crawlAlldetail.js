@@ -4,10 +4,10 @@
 * 参数：page：当前页，默认1
 * pageSize：每页条数，默认100
 * */
-const superagent = require('_superagent@5.3.1@superagent');
-require('_superagent-charset@1.2.0@superagent-charset')(superagent);
-const cheerio = require('_cheerio@1.0.0-rc.3@cheerio');
-const async = require('_async@3.2.0@async');
+const superagent = require('superagent');
+require('superagent-charset')(superagent);
+const cheerio = require('cheerio');
+const async = require('async');
 const { addData, findData, deleData } = require('../../mysql/mysql');
 
 let typeObj = {

@@ -1,7 +1,7 @@
 /**
  * @name  loading组件
  */
-import Vue from 'Vue'
+import Vue from 'vue'
 import meLoading from './me-loading'
 
 const Loading = {}
