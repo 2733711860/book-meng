@@ -10,6 +10,7 @@ import { get, post } from './http.js'
 export const baseUrl = `http://localhost:8080/api`
 // export const baseUrl = 'https://www.fastmock.site/mock/f5b0436d25760cd9e4b88fdf3de4d459/api'
 
+export const searchBook = params => get(`${baseUrl}/search/book`, params) // 多条件查询
 
 export const getBookByAuthor = params => get(`${baseUrl}/search/authorbook`, params) // 根据作者查询书籍
 
@@ -20,6 +21,8 @@ export const getBookByRank = params => get(`${baseUrl}/search/rankbook`, params)
 export const getBookByType = params => get(`${baseUrl}/search/typebook`, params) // 根据分类获取书籍
 
 export const getBookByWord = params => get(`${baseUrl}/search/wordbook`, params) // 根据关键字查询书籍
+
+export const deleteBook = params => get(`${baseUrl}/delete/book`, params) // 删除书籍
 
 export const getBookChapter = params => get(`${baseUrl}/get/chapter`, params) // 获取章节
 

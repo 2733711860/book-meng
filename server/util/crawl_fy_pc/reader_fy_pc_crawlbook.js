@@ -24,6 +24,8 @@ let stateObj = {
   '连载中': '2'
 };
 
+let pages = 1; // 总页数
+
 // https://www.44pq.cc/allvisit-1.html
 module.exports = {
   fyPcCrawlBook(start, end) {
@@ -57,7 +59,7 @@ module.exports = {
                 status: 200,
                 data: {
                   saveResult: res,
-                  linkPages: links
+                  totalPage: pages
                 },
                 msg: '保存成功'
               })
@@ -106,7 +108,6 @@ function getFYBookPages(start, end) { // 获取小说列表每页url列表
             return
           };
           var $ = cheerio.load(res.text);
-          let pages = 1;
           pages = $("#pagelink").find("a.last").text(); // 获取小说列表总页数
           let links = [];
           for (var i=(start>=1 ? start : 1); i<=(end <= pages ? end : pages); i++) {
