@@ -58,7 +58,7 @@ module.exports = {
               resolve({
                 status: 200,
                 data: {
-                  saveResult: res,
+                  saveResult: bookList,
                   totalPage: pages
                 },
                 msg: '保存成功'

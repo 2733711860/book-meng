@@ -25,7 +25,7 @@ module.exports = async (ctx) => {
       let res = await findData((sqls));
       if (res[0]['count(*)'] == 0) { // 不存在
         resolve({
-          status: 500,
+          status: 1001,
           data: null,
           msg: '暂无本书信息'
         });

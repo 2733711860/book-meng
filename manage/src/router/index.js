@@ -27,17 +27,17 @@ export default new Router({
                 {
                     path: '/table',
                     component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
-                    meta: { title: '基础表格' }
+                    meta: { title: '书籍列表' }
                 },
                 {
                     path: '/tabs',
                     component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
-                    meta: { title: 'tab选项卡' }
+                    meta: { title: '书籍列表' }
                 },
                 {
                     path: '/form',
                     component: () => import(/* webpackChunkName: "form" */ '../components/page/BaseForm.vue'),
-                    meta: { title: '图片平台' }
+                    meta: { title: '自主爬取' }
                 },
                 {
                     // 富文本编辑器组件
@@ -55,13 +55,19 @@ export default new Router({
                     // 图片上传组件
                     path: '/upload',
                     component: () => import(/* webpackChunkName: "upload" */ '../components/page/Upload.vue'),
-                    meta: { title: '文件上传' }
+                    meta: { title: '书籍列表' }
                 },
+								{
+								    // 图片上传组件
+								    path: '/detail',
+								    component: () => import(/* webpackChunkName: "upload" */ '../components/page/detail.vue'),
+								    meta: { title: '书籍详情' }
+								},
                 {
                     // vue-schart组件
                     path: '/charts',
                     component: () => import(/* webpackChunkName: "chart" */ '../components/page/BaseCharts.vue'),
-                    meta: { title: 'schart图表' }
+                    meta: { title: '自主获取' }
                 },
                 {
                     // 拖拽列表组件

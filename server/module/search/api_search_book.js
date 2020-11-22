@@ -1,6 +1,6 @@
 /*
  多条件查询
- 参数：keyWord：搜索关键字
+ 参数：bookName：搜索关键字
  bookType: 书籍类型 1, 2, 3, 4, 5, 6  默认空，即全部
  bookAuthor：作者，默认空
  isSerial：连载状态 1， 2， 默认空
@@ -17,7 +17,7 @@ module.exports = async (ctx) => {
       let {
         page = 1,
         pageSize = 10,
-        keyWord = '',
+        bookName = '',
         bookType = '',
         bookAuthor = '',
         isSerial = '',
@@ -36,12 +36,13 @@ module.exports = async (ctx) => {
       }
 
       let searchSql = `select sql_calc_found_rows * from book where
-        (instr(bookName, '${keyWord}') > 0) and
+        (instr(bookName, '${bookName}') > 0) and
         (instr(bookType, '${bookType}') > 0) and
         (instr(bookAuthor, '${bookAuthor}') > 0) and
         (instr(isSerial, '${isSerial}') > 0) and
         (instr(source, '${source}') > 0)
         order by latelyFollower desc limit ${(page-1) * (pageSize)}, ${pageSize}`;
+      console.log(searchSql)
       let result = await findData(searchSql);
       let total = await findData(`SELECT FOUND_ROWS() as total;`);
       resolve({

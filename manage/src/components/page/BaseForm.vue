@@ -1,221 +1,197 @@
 <template>
-	<div class="nowpage">
+	<div>
 		<div class="crumbs">
 			<el-breadcrumb separator="/">
 				<el-breadcrumb-item>
-					<i class="el-icon-lx-calendar"></i> 图片
+					<i class="el-icon-lx-calendar"></i> 书籍爬取
 				</el-breadcrumb-item>
-				<el-breadcrumb-item>图片列表</el-breadcrumb-item>
+				<el-breadcrumb-item>自主爬取</el-breadcrumb-item>
 			</el-breadcrumb>
 		</div>
 		<div class="container">
-			<div class="basic_button">
-				<div class="basic_item">
-					<div class="basic_name">图片名称</div>
-					<el-input v-model="searchData.picName" placeholder="请输入图片名称"></el-input>
-				</div>
-				<div class="basic_item" style="margin-left: 30px;">
-					<div class="basic_name">上传时间</div>
-					<el-col :span="11">
-			      <el-date-picker type="date" placeholder="起始日期" v-model="searchData.startDate" style="width: 100%;"></el-date-picker>
-			    </el-col>
-			    <el-col style="text-align: center;" :span="2">-</el-col>
-			    <el-col :span="11">
-			      <el-date-picker type="date" placeholder="截止日期" v-model="searchData.endDate" style="width: 100%;"></el-date-picker>
-			    </el-col>
-				</div>
+			<div class="plugins-tips">
+				风雨小说网PC端访问地址：
+				<a href="https://www.44pq.cc/" target="_blank">风雨小说</a>
 			</div>
-			<div class="basic_button">
-				<div class="basic_item">
-					<div class="basic_name">上传者姓名</div>
-					<el-input v-model="searchData.picUserName" placeholder="请输入上传者姓名"></el-input>
+			<div class="schart-box">
+				<div class="content-title">爬取小说列表</div>
+				<div class="handle-box">
+					<div>
+						书源：
+						<el-select v-model="source" placeholder="请选择书源" class="handle-select mr10">
+							<el-option v-for="(item, index) in sourceList" :key="index" :label="item.text" :value="item.value"></el-option>
+						</el-select>
+					</div>
+					<div>
+						开始页码：<el-input-number v-model="startNum" :min="1" :max="totalPage"></el-input-number>
+					</div>
+					<div>
+						结束页码：<el-input-number v-model="endNum" :min="1" :max="totalPage"></el-input-number>
+					</div>
+					<el-button type="primary" icon="el-icon-ice-cream-round" @click="crawlBook">爬取</el-button>
 				</div>
-				<div class="basic_item" style="margin-left: 30px;">
-					<el-button size="mini" type="primary" @click="init()">查询</el-button>
-					<el-button size="mini">重置</el-button>
-				</div>
+				<div class="handle-box-result">{{crawlResult}}</div>
 			</div>
-		  <el-table
-		  	class="pageTable"
-		    ref="filterTable"
-		    :data="tableData"
-		    max-height="350"
-		    tooltip-effect="dark"
-		    @filter-change="filterChange"
-		    @selection-change="handleSelectionChange">
-		    <el-table-column
-		      type="selection"
-		      align="center"
-		      width="55">
-		    </el-table-column>
-		    <el-table-column
-		      prop="name"
-		      align="center"
-		      label="图片名称"
-		      width="150">
-		    </el-table-column>
-		    <el-table-column
-		      prop="userName"
-		      label="上传者"
-		      align="center"
-		      width="120">
-		    </el-table-column>
-		    <el-table-column
-		      prop="time"
-		      label="上传日期"
-		      align="center"
-		      width="150"
-		    >
-		    </el-table-column>
-		    <el-table-column
-		      prop="describe"
-		      label="图片描述"
-		      align="center"
-		      min-width="250">
-		    </el-table-column>
-		    <el-table-column
-		      prop="classify"
-		      label="分类"
-		      align="center"
-		      min-width="100"
-		      :filters="classifyList"
-		      :column-key="'time'"
-		      filter-placement="bottom-end">
-		      <template slot-scope="scope">
-		        <el-tag
-		          disable-transitions>{{classifyList.filter(item=>item.value==scope.row.classify)[0].text}}</el-tag>
-		      </template>
-		    </el-table-column>
-		    <el-table-column property="imageUrl" label="图片预览" align="center" width="150">
-          <template slot-scope="scope">
-            <el-image
-              style="width: 50px; height: 50px"
-              :src="scope.row.imageUrl"
-              :preview-src-list="scope.row.srcList">
-            </el-image>
-          </template>
-        </el-table-column>
-		    <el-table-column
-		      label="操作"
-		      fixed="right"
-		      align="center"
-		      min-width="220">
-		      <template slot-scope="scope">
-		        <el-button size="mini" @click="handleClick(scope.row)">编辑</el-button>
-		        <el-button size="mini" type="danger">删除</el-button>
-		      </template>
-		    </el-table-column>
-		  </el-table>
-
-		  <div class="base_pagination">
-		  	<el-pagination
-		      @size-change="handleSizeChange"
-		      @current-change="handleCurrentChange"
-		      :current-page="currentPage"
-		      :page-sizes="[5, 10, 20, 50]"
-		      :page-size="pageSize"
-		      layout="total, sizes, prev, pager, next, jumper"
-		      :total="total">
-		    </el-pagination>
-		  </div>
+		</div>
+		
+		<div class="container-two">
+			<div class="schart-box">
+				<div class="content-title">爬取小说详情</div>
+				<div class="handle-box">
+					<div>
+						页码：<el-input-number v-model="page" :min="1"></el-input-number>
+					</div>
+					<div>
+						偏移：<el-input-number v-model="pageSize" :min="1" :max="100"></el-input-number>
+					</div>
+					<el-button type="primary" icon="el-icon-ice-cream-round" @click="crawlDetails">爬取</el-button>
+				</div>
+				<div class="handle-box-result">{{crawlDetailResult}}</div>
+			</div>
+		</div>
+		
+		<div class="container-two">
+			<div class="schart-box">
+				<div class="content-title">爬取小说详情（单本手动添加）</div>
+				<div class="handle-box">
+					书籍链接：<el-input v-model="bookLink" placeholder="书籍链接" class="handle-input mr10"></el-input>
+					<el-button type="primary" icon="el-icon-ice-cream-round" @click="crawlDetail">爬取</el-button>
+				</div>
+				<div class="handle-box-result">{{crawlOneBookResult}}</div>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+import { crawlBookTosql, crawlDetailsTosql, getBookDetail } from '../../api/index.js'
 export default {
 	data() {
 		return {
-			tableData: [], // 表格数据
-      search: '', // 搜索关键字
-      currentPage: 1, // 当前页
-      pageSize: 10, // 每页10条
-      total: 0, // 总数据数
-      selectValue: '1', // 搜索分类
-      classifyList: [], // 图片分类列表
-    	searchData: {
-    		picName: '', // 搜索图片名称
-	    	picUserName: '', // 上传者姓名
-	    	picClassify: '', // 搜索图片类别
-	    	startDate: '', // 搜索开始时间
-	    	endDate: '' // 搜索结束时间
-    	}
+			sourceList: [ // 书源列表
+				{ text: '风雨小说网（PC端）', value: 'fy_pc' }
+			],
+			source: 'fy_pc', // 爬取小说列表 选择的书源
+			startNum: 1, // 爬取小说列表 开始页码
+			endNum: 1, // 爬取小说列表 结束页码
+			totalPage: 10, // 爬取小说列表 可供爬取书籍的总页数
+			crawlResult: '', // 爬取小说列表 爬取结果
+			page: 1, // 爬取小说详情 页码
+			pageSize: 10, // 爬取小说详情 每次爬取10本
+			crawlDetailResult: '', // 爬取小说详情 爬取结果
+			bookLink: '', // 爬取小说详情（单本手动） 书籍链接
+			crawlOneBookResult: '' // 爬取小说详情（单本手动） 爬取结果
 		}
 	},
-	mounted() {
-		this.getClassify()
-		this.init()
-	},
+	
 	methods: {
-		async getClassify() { // 获取图片分类
-			await this.$post(this.$api.getClassify).then(data => {
-    		if (data.code == 200) {
-    			this.classifyList = data.data.classifyList
+		crawlBook () { // 爬取小说列表
+			crawlBookTosql({
+				source: this.source,
+				start: this.startNum,
+				end: this.endNum
+			}).then(res => {
+				if (res.status == 200) {
+					this.totalPage = Number(res.data.totalPage);
+					this.crawlResult = `成功获取${res.data.saveResult.affectedRows}本书籍！（最多${res.data.totalPage}页）`;
+					this.$message.success(res.msg);
 				} else {
-					this.$message.error(data.msg);
+					this.$message.error(res.msg);
 				}
-	    })
+			})
 		},
-		async init() { // 查询接口
-			let param = {
-				name: this.searchData.picName, // 图片名称
-				classify: this.searchData.picClassify, // 图片分类
-				userName: this.searchData.picUserName, // 上传者姓名
-				page: this.currentPage, // 当前页
-				pageSize: this.pageSize // 每页多少条
-			}
-			await this.$post(this.$api.search, param).then(data => {
-    		if (data.code == 200) {
-    			this.total = data.data.page.total
-    			this.tableData = data.data.list
-    			this.$forceUpdate()
+		
+		crawlDetails () { // 爬取小说详情
+			crawlDetailsTosql({
+				page: this.page,
+				pageSize: this.pageSize
+			}).then(res => {
+				if (res.status == 200) {
+					this.crawlDetailResult = `第${this.page}页,成功获取${res.data.books.length}本书籍！（总共${res.data.total}本）`;
+					this.$message.success(res.msg);
 				} else {
-					this.$message.error(data.msg);
+					this.$message.error(res.msg);
 				}
-	    })
+			})
 		},
-		filterChange(filters) { // 筛选发生变化
-			this.searchData.picClassify = filters.time
-			this.init()
-		},
-    handleSelectionChange(val) { // 多选发生变化
-    },
-    handleClick(row) { // 点击行方法
-      console.log(row);
-    },
-    handleSizeChange(val) { // 每页条数发生变化
-    	this.pageSize = val
-    	this.init()
-    },
-    handleCurrentChange(val) { // 当前页变化
-    	this.currentPage = val
-    	this.init()
-    },
-    resetForm() { // 重置
-    	this.$refs.searchF.resetFields();
-    }
+		
+		crawlDetail () { // 爬取小说详情（单本手动）
+		  let links = [];
+			links.push(this.bookLink)
+			getBookDetail({
+				links: links,
+			}).then(res => {
+				if (res.status == 200) {
+					this.crawlOneBookResult = `${res.data.books[0].bookName}获取成功！`;
+					this.$message.success(res.msg);
+				} else {
+					this.$message.error(res.msg);
+				}
+			})
+		}
 	}
 }
 </script>
 
-<style scoped="scoped">
-	.basic_button{
-		margin-bottom: 15px;
-		display: flex;
+<style scoped>
+	.container-two{
+		background: #fff;
+		border: 1px solid #ddd;
+		border-radius: 5px;
+		padding: 10px 30px;
+		margin-top: 20px;
 	}
-	.basic_item{
+	.schart-box {
+		display: inline-block;
+		margin: 20px;
+		width: 100%;
+	}
+
+	.content-title {
+		clear: both;
+		font-weight: 400;
+		line-height: 50px;
+		margin: 10px 0;
+		font-size: 22px;
+		color: #1f2f3d;
+	}
+	
+	.handle-box {
+		margin-bottom: 20px;
 		display: flex;
 		align-items: center;
 	}
-	.basic_name{
-		width: 100px;
-		color: #606266;
-		font-size: 14px;
-	}
-	.tab_search{
+	
+	.handle-input{
 		width: 350px;
 	}
-	.base_pagination{
+	
+	.handle-box-result{
 		margin-top: 20px;
+		text-align: center;
+	}
+	
+	.handle-box div{
+		margin-right: 20px;
+	}
+	
+	.table {
+		width: 100%;
+		font-size: 14px;
+	}
+	
+	.red {
+		color: #ff0000;
+	}
+	
+	.mr10 {
+		margin-right: 10px;
+	}
+	
+	.table-td-thumb {
+		display: block;
+		margin: auto;
+		width: 40px;
+		height: 40px;
 	}
 </style>

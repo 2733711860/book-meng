@@ -52,9 +52,17 @@
 					</template>
 				</el-table-column>
 			</el-table>
-			<div class="pagination">
-				<el-pagination background layout="total, prev, pager, next" :current-page="page" :page-size="pageSize"
-				 :total="pageTotal" @current-change="handlePageChange"></el-pagination>
+			
+			<div class="base_pagination">
+				<el-pagination
+			    @size-change="handleSizeChange"
+			    @current-change="handlePageChange"
+			    :current-page="page"
+			    :page-sizes="[5, 10, 20, 50, 100]"
+			    :page-size="pageSize"
+			    layout="total, sizes, prev, pager, next, jumper"
+			    :total="pageTotal">
+			  </el-pagination>
 			</div>
 		</div>
 
@@ -136,6 +144,12 @@ export default {
 		
 		handlePageChange(val) { // 分页导航
 			this.page = val;
+			this.getData();
+		},
+		
+		handleSizeChange (val) { // 每页条数发生变化
+			this.pageSize = val;
+			this.page = 1;
 			this.getData();
 		},
 		

@@ -35,7 +35,7 @@ module.exports = {
           });
           return
         }
-        let sql = `select sql_calc_found_rows bookId from book limit ${(page-1) * (pageSize)}, ${pageSize}`;
+        let sql = `select sql_calc_found_rows bookId from book order by bookId desc limit ${(page-1) * (pageSize)}, ${pageSize}`;
         let bookList = await findData(sql);
         let total = await findData(`SELECT FOUND_ROWS() as total;`);
 

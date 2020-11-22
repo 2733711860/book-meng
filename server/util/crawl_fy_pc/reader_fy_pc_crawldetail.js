@@ -100,7 +100,7 @@ function getDetail(url, callback) { // 获取小说详情
           let str_1 = $(".bookinfo .panel-intro .infos").children(".item:first-child").text();
           oneBook.isSerial = str_1.indexOf('连载中') > -1 ? '2' : '1'; // 连载状态
           oneBook.bookImg = $(".bookinfo .pic").find("img").attr("src"); // 书籍封面
-					oneBook.bookId = url.slice(url.indexOf('cc/kan/') + 8, url.length - 1); // 书籍Id
+					oneBook.bookId = url.slice(url.indexOf('cc/kan/') + 7, url.length - 1); // 书籍Id
           oneBook.bookDesc = trim($(".bookinfo .panel-intro .intro").text()); // 书籍简介
           let str = $(".bookinfo .panel-intro .infos").text();
           oneBook.wordCount = Number(str.slice(str.indexOf('(共') + 2, str.indexOf('万字)'))) * 10000; // 书籍字数

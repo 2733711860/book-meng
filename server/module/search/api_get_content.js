@@ -27,22 +27,31 @@ module.exports = async (ctx) => {
       let res = await findData((sqls));
       if (res[0]['count(*)'] == 0) { // 不存在
         resolve({
-          status: 500,
+          status: 1001,
           data: null,
           msg: '暂无本书信息'
         });
         return
       }
 
-      let searchSql = `select * from book_${bookId} where chapterId = ${chapterId}`;
+      let searchSql = `select title, cpContent from book_${bookId} where chapterId = ${chapterId}`;
       let result = await findData(searchSql);
-      resolve({
-        status: 200,
-        data: {
-          list: result
-        },
-        msg: '查询成功'
-      })
+      if (result && result[0] && result [0].cpContent && result [0].cpContent != '') {
+        resolve({
+          status: 200,
+          data: {
+            title: result[0].title,
+            cpContent: result[0].cpContent
+          },
+          msg: '查询成功'
+        })
+      } else {
+        resolve({
+          status: 1001,
+          data: null,
+          msg: '暂无本章信息'
+        })
+      }
     } catch (e) {
       resolve({
         status: 500,

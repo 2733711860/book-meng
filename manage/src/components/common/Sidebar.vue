@@ -46,20 +46,20 @@
 					{
 						icon: 'el-icon-lx-cascades',
 						index: 'table',
-						title: '基础表格'
+						title: '书籍列表'
 					},
 					{
 						icon: 'el-icon-lx-copy',
 						index: 'tabs',
-						title: '图片平台'
+						title: '书籍列表'
 					},
 					{
 						icon: 'el-icon-lx-calendar',
 						index: '3',
-						title: '图片平台',
+						title: '书籍爬取',
 						subs: [{
 								index: 'form',
-								title: '图片列表'
+								title: '自主爬取'
 							},
 							{
 								index: '3-2',
@@ -76,7 +76,11 @@
 							},
 							{
 								index: 'upload',
-								title: '文件上传'
+								title: '书籍列表'
+							},
+							{
+								index: 'detail',
+								title: '书籍详情'
 							}
 						]
 					},
@@ -88,7 +92,7 @@
 					{
 						icon: 'el-icon-pie-chart',
 						index: 'charts',
-						title: 'schart图表'
+						title: '自主获取'
 					},
 					{
 						icon: 'el-icon-rank',

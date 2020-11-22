@@ -56,7 +56,7 @@
 <script>
 // 护眼：rgb(200, 232, 200)；默认：rgb(238, 230, 221)；rgba(50,51,52,0.9)
 import { _nromalBook } from '../../../utils/bookUtil.js'
-import { getBookContent } from '../../../api/index.js'
+import { getBookContent, getContent } from '../../../api/index.js'
 import { Toast, Dialog } from 'vant'
 import readerToolPageTop from '../components/reader-tool-page-top.vue'
 import readerToolPageBottom from '../components/reader-tool-page-bottom.vue'
@@ -79,7 +79,6 @@ export default {
 			currentPaging: 1, // 当前页
 			resultPaging: 1, // 总页数
 			offsetX: 0,
-			bookSourceLinks: [], // 书籍link列表
 			currentIndex: -1, // 当前章节索引
 			isPrevChapter: false, // 是否上一章
 			showTool: false, // 是否显示工具栏
@@ -147,27 +146,51 @@ export default {
 					currentChapterIndex: this.currentIndex
 				})
 			} else { // 本章没有缓存
-				let currentLink = this.thisBook.chapters[this.currentIndex].link // 当前章节链接
 				this.$loading.show()
-				getBookContent({
-					source: this.thisBook.source,
-					link: currentLink
+				getContent({
+					bookId: this.$route.query.bookId,
+					chapterId: this.thisBook.chapters[this.currentIndex].chapterId
 				}).then(res => {
 					this.$loading.hide()
-					if (res.data.cpContent) {
-						this.bookContent = _nromalBook(res.data.title, res.data.cpContent)
-					} else {
-						this.bookContent = _nromalBook(res.data.title, '正文获取失败！')
-					}
-					this.$store.dispatch('setCacheBooks', { // 保存章节信息
-						bookId: this.$route.query.bookId,
-						currentChapterIndex: this.currentIndex,
-						newReadChapter: {
-							chapterIndex: this.currentIndex,
-							chapterName: res.data.title,
-							chapterContent: res.data.cpContent ? res.data.cpContent : '正文获取失败！'
+					if (res.status == 1001) { // 暂无本章信息，则调用爬取接口
+						this.$loading.show()
+						getBookContent({
+							source: this.thisBook.source,
+							bookId: this.$route.query.bookId,
+							chapterId: this.thisBook.chapters[this.currentIndex].chapterId
+						}).then(res => {
+							this.$loading.hide()
+							if (res.data.cpContent) {
+								this.bookContent = _nromalBook(res.data.title, res.data.cpContent)
+							} else {
+								this.bookContent = _nromalBook(res.data.title, '正文获取失败！')
+							}
+							this.$store.dispatch('setCacheBooks', { // 保存章节信息
+								bookId: this.$route.query.bookId,
+								currentChapterIndex: this.currentIndex,
+								newReadChapter: {
+									chapterIndex: this.currentIndex,
+									chapterName: res.data.title,
+									chapterContent: res.data.cpContent ? res.data.cpContent : '正文获取失败！'
+								}
+							})
+						})
+					} else if (res.status == 200) {
+						if (res.data.cpContent) {
+							this.bookContent = _nromalBook(res.data.title, res.data.cpContent)
+						} else {
+							this.bookContent = _nromalBook(res.data.title, '正文获取失败！')
 						}
-					})
+						this.$store.dispatch('setCacheBooks', { // 保存章节信息
+							bookId: this.$route.query.bookId,
+							currentChapterIndex: this.currentIndex,
+							newReadChapter: {
+								chapterIndex: this.currentIndex,
+								chapterName: res.data.title,
+								chapterContent: res.data.cpContent ? res.data.cpContent : '正文获取失败！'
+							}
+						})
+					}
 				})
 			}
 		},

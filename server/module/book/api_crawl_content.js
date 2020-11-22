@@ -1,7 +1,7 @@
 /*
 * 爬取书籍正文
 * 参数：source：小说来源
-* page, pageSize
+* chapterId, bookId
 *
 * */
 const { fyPcCrawlContent } = require('../../util/crawl_fy_pc/reader_fy_pc_crawlcontent');
@@ -11,13 +11,12 @@ module.exports = async (ctx) => {
   return new Promise((resolve, reject) => {
     let {
       source = 'fy_pc',
-      page = 1,
-      pageSize = 20,
+      chapterId = '',
       bookId = ''
     } = ctx.query;
 
     if (source == 'fy_pc') {
-      fyPcCrawlContent(page, pageSize, bookId).then(res => {
+      fyPcCrawlContent(chapterId, bookId).then(res => {
         resolve(res)
       })
     } else if (source == 'fy_yd') {

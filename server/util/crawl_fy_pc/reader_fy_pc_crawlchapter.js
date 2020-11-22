@@ -31,7 +31,7 @@ module.exports = {
             bookId varchar(255),
             bookName varchar(255),
             title varchar(255),
-            chapterId varchar(255) not null,
+            chapterId int(255) not null,
             cpContent longtext,
             primary key (chapterId)
           )charset=utf8`;
@@ -42,7 +42,7 @@ module.exports = {
             resolve({
               status: 200,
               data: {
-                list: res
+                list: chapters
               },
               msg: '章节保存成功'
             })

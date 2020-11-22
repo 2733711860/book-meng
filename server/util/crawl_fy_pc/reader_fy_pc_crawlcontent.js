@@ -12,12 +12,10 @@ const { addData, findData } = require('../../mysql/mysql');
 
 // https://www.44pq.cc/kan/152711/58536407.html
 module.exports = {
-  fyPcCrawlContent(page, pageSize, bookId) {
+  fyPcCrawlContent(chapterId, bookId) {
     return new Promise(async (resolve, reject) => {
-      page = Number(page);
-      pageSize = Number(pageSize);
 
-      if (page < 1 || pageSize < 1 || bookId == '') {
+      if (chapterId == '' || bookId == '') {
         resolve({
           status: 500,
           data: null,
@@ -26,69 +24,47 @@ module.exports = {
         return
       }
 
-      let sql = `select sql_calc_found_rows chapterId from book_${bookId} limit ${(page-1) * (pageSize)}, ${pageSize}`;
-      let linkList = await findData(sql);
-      let total = await findData(`SELECT FOUND_ROWS() as total;`);
-
-      if (linkList.length == 0) {
-        resolve({
-          status: 500,
-          data: null,
-          msg: "本次查询为空"
-        })
-      }
-
-      let links = linkList.map(item => {
-        return `https://www.44pq.cc/kan/${bookId}/${item.chapterId}.html`
-      });
-
-      async.mapLimit(links, 10, (item, callback) => {
-        getBookContent(item, callback, bookId)
-      }, async (err, results) => {
-        if (err) {
+      let link = `https://www.44pq.cc/kan/${bookId}/${chapterId}.html`;
+      getBookContent(link, chapterId).then(content => {
+        saveContents([content], bookId).then(res => {
+          resolve({
+            status: 200,
+            data: {
+              title: content.title,
+              cpContent: content.cpContent
+            },
+            msg: '正文保存成功'
+          })
+        }).catch(err => {
           resolve({
             status: 500,
             data: err,
-            msg: '正文爬取失败'
+            msg: '正文保存失败'
           })
-        } else {
-          saveContents(results, bookId).then(res => {
-            resolve({
-              status: 200,
-              data: {
-                saveResult: res,
-                chapters: total[0].total
-              },
-              msg: '正文保存成功'
-            })
-          }).catch(err => {
-            resolve({
-              status: 500,
-              data: err,
-              msg: '正文保存失败'
-            })
-          })
-        }
-      });
+        })
+      }).catch(err => {
+
+      })
     })
   }
 };
 
 // https://www.44pq.cc/kan/11881/6596708.html
-function getBookContent(url, callback, bookId) { // 爬取正文
+function getBookContent(url, chapterId) { // 爬取正文
   return new Promise((resolve, reject) => {
     superagent.get(url)
       .charset('gbk')
       .buffer(true)
       .end((err, res) => {
         if (err) {
-          callback(url);
+          reject(url);
         } else if (res && res.text) {
           var $ = cheerio.load(res.text);
           let contents = {};
+          contents.title = $("#BookCon").find("h1").text();
           contents.cpContent = trim($("#BookText").text()).replace('一秒记住【风雨小说网 www.44pq.cc】，精彩小说无弹窗免费阅读！', ''); // 正文
-          contents.chapterId = url.slice(url.indexOf(bookId) + bookId.length + 1, url.length - 5);
-          callback(null, contents);
+          contents.chapterId = chapterId;
+          resolve(contents);
         }
       })
   })

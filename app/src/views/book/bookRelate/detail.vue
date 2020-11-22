@@ -116,7 +116,7 @@
 import readerHeaderTwo from '../components/reader-header-two.vue'
 import readerItemBookTwo from '../components/reader-item-book-two.vue'
 import readerComment from '../components/reader-comment.vue'
-import { getBookChapter, getBookByAuthor, getBookByRandom } from '../../../api/index.js'
+import { getBookChapter, getBookByAuthor, getBookByRandom, getCrawlChapter } from '../../../api/index.js'
 import { typeObj } from '../../../utils/bookUtil.js'
 import moment from 'moment'
 const ANCHOR_SCROLL_TOP = 160
@@ -175,11 +175,32 @@ export default {
 				source: this.bookDetail.source
 			}).then(res => {
 				this.$loading.hide()
-				this.$store.dispatch('setCacheBooks', { // 保存书籍信息
-					bookId: this.bookDetail.bookId,
-					chapters: res.data.list,
-					chaptersCount: res.data.list.length
-				})
+				if (res.status == 1001) { // 数据库没有这本书的章节信息，则调用爬取接口
+					this.crawlChapter()
+				} else if (res.status == 200) {
+					this.$store.dispatch('setCacheBooks', { // 保存书籍信息
+						bookId: this.bookDetail.bookId,
+						chapters: res.data.list,
+						chaptersCount: res.data.list.length
+					})
+				}
+			})
+		},
+		
+		crawlChapter () { // 通过爬取获取章节信息
+			this.$loading.show()
+			getCrawlChapter({
+				bookId: this.bookDetail.bookId,
+				source: this.bookDetail.source
+			}).then(res => {
+				this.$loading.hide()
+				if (res.status == 200) {
+					this.$store.dispatch('setCacheBooks', { // 保存书籍信息
+						bookId: this.bookDetail.bookId,
+						chapters: res.data.list,
+						chaptersCount: res.data.list.length
+					})
+				}
 			})
 		},
 		

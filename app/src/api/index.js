@@ -6,8 +6,8 @@
  */
 import { get } from './http.js'
 
-export const baseUrl = `http://121.41.79.10:8080/api`
-// export const baseUrl = `http://localhost:8080/api`
+// export const baseUrl = `http://121.41.79.10:8080/api`
+export const baseUrl = `http://localhost:8080/api`
 // export const baseUrl = 'https://www.fastmock.site/mock/f5b0436d25760cd9e4b88fdf3de4d459/api'
 
 
@@ -29,7 +29,9 @@ export const getHotWord = params => get(`${baseUrl}/search/hotWord`, params) // 
 
 export const getBookDetail = params => get(`${baseUrl}/crawl/detail`, params) // 获取书籍详情
 
-export const getBookContent = params => get(`${baseUrl}/crawl/content`, params) // 获取正文
+export const getBookContent = params => get(`${baseUrl}/crawl/content`, params) // 获取正文(爬取)
+
+export const getContent = params => get(`${baseUrl}/get/content`, params) // 获取正文
 
 export const crawlBookTosql = params => get(`${baseUrl}/crawl/book`, params) // 爬取书籍到数据库
 

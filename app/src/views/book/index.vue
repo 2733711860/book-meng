@@ -10,7 +10,7 @@
 import readerHeader from './components/reader-header.vue'
 import readerFooter from './components/reader-footer.vue'
 import transferUtil from '../../utils/middle-transfer.js'
-import { getBookContent } from '../../api/index.js'
+import { getBookContent, getContent } from '../../api/index.js'
 import { Toast } from 'vant'
 export default {
 	components: {
@@ -44,32 +44,62 @@ export default {
 					Toast(`${thisBook.bookName} 缓存完成`)
 				}
 			} else { // 本章没有缓存
-				let currentLink = thisBook.chapters[startIndex].link // 当前章节链接
-				getBookContent({
-					link: currentLink,
-					source: thisBook.source
+				getContent({
+					bookId: thisBook.bookId,
+					chapterId: thisBook.chapters[startIndex].chapterId
 				}).then(res => {
-					this.$store.dispatch('setCacheBooks', { // 保存章节信息
-						bookId: thisBook.bookId,
-						newReadChapter: {
-							chapterIndex: startIndex,
-							chapterName: res.data.title,
-							chapterContent: res.data.cpContent ? res.data.cpContent : '正文获取失败！'
+					if (res.status == 1001) { // 暂无本章信息，则调用爬取接口
+						getBookContent({
+							source: thisBook.source,
+							bookId: thisBook.bookId,
+							chapterId: thisBook.chapters[startIndex].chapterId
+						}).then(res => {
+							this.$store.dispatch('setCacheBooks', { // 保存章节信息
+								bookId: thisBook.bookId,
+								newReadChapter: {
+									chapterIndex: startIndex,
+									chapterName: res.data.title,
+									chapterContent: res.data.cpContent ? res.data.cpContent : '正文获取失败！'
+								}
+							})
+							if (startIndex < endIndex) {
+								startIndex++
+								this.$store.dispatch('setCacheBooks', { // 保存缓存进度
+									bookId: thisBook.bookId,
+									cacheStart: startIndex
+								})
+								this.getChapterDetail(startIndex, endIndex, thisBook)
+							} else {
+								this.$store.dispatch('setCacheBooks', { // 保存缓存进度(缓存完成)
+									bookId: thisBook.bookId,
+									cacheState: '3'
+								})
+								Toast(`${thisBook.bookName} 缓存完成`)
+							}
+						})
+					} else if (res.status == 200) {
+						this.$store.dispatch('setCacheBooks', { // 保存章节信息
+							bookId: thisBook.bookId,
+							newReadChapter: {
+								chapterIndex: startIndex,
+								chapterName: res.data.title,
+								chapterContent: res.data.cpContent ? res.data.cpContent : '正文获取失败！'
+							}
+						})
+						if (startIndex < endIndex) {
+							startIndex++
+							this.$store.dispatch('setCacheBooks', { // 保存缓存进度
+								bookId: thisBook.bookId,
+								cacheStart: startIndex
+							})
+							this.getChapterDetail(startIndex, endIndex, thisBook)
+						} else {
+							this.$store.dispatch('setCacheBooks', { // 保存缓存进度(缓存完成)
+								bookId: thisBook.bookId,
+								cacheState: '3'
+							})
+							Toast(`${thisBook.bookName} 缓存完成`)
 						}
-					})
-					if (startIndex < endIndex) {
-						startIndex++
-						this.$store.dispatch('setCacheBooks', { // 保存缓存进度
-							bookId: thisBook.bookId,
-							cacheStart: startIndex
-						})
-						this.getChapterDetail(startIndex, endIndex, thisBook)
-					} else {
-						this.$store.dispatch('setCacheBooks', { // 保存缓存进度(缓存完成)
-							bookId: thisBook.bookId,
-							cacheState: '3'
-						})
-						Toast(`${thisBook.bookName} 缓存完成`)
 					}
 				})
 			}

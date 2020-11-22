@@ -2,209 +2,126 @@
 	<div>
 		<div class="crumbs">
 			<el-breadcrumb separator="/">
-				<el-breadcrumb-item><i class="el-icon-lx-calendar"></i> 图片</el-breadcrumb-item>
-				<el-breadcrumb-item>图片上传</el-breadcrumb-item>
+				<el-breadcrumb-item><i class="el-icon-lx-calendar"></i> 书籍爬取</el-breadcrumb-item>
+				<el-breadcrumb-item>书籍列表</el-breadcrumb-item>
 			</el-breadcrumb>
 		</div>
 		<div class="container">
-			<div class="form_content">
-        <div class="unloaddiv">
-        	<el-dialog :visible.sync="dialogVisible" size="tiny">
-					  <img width="100%" :src="dialogImageUrl" alt="">
-					</el-dialog>
-        	<el-upload
-        		ref="imageUpload"
-					  action="https://jsonplaceholder.typicode.com/posts/"
-					  :on-preview="handlePictureCardPreview"
-					  :on-remove="handleRemove"
-					  :on-exceed="handleExceed"
-					  :on-change="handleChange"
-					  :file-list="fileList"
-					  :auto-upload="false"
-					  :limit="limit"
-					  list-type="picture">
-					  <el-button slot="trigger" size="small" type="primary">选择图片</el-button>
-					  <el-button style="margin-left: 10px;" size="small" type="success" @click="uploadFile">上传到服务器</el-button>
-					</el-upload>
-        </div>
-
-        <el-dialog title="上传图片" :visible.sync="dialogUploadVisible" width="800" center>
-        	<el-form ref="uploadForm" :model="uploadForm" :rules="uploadRules" status-icon label-width="100px" class="imageform">
-	        	<el-form-item label="图片名称" prop="name">
-	        		<el-input v-model="uploadForm.name" placeholder="请输入图片名称"></el-input>
-	        	</el-form-item>
-	          <el-form-item label="图片分类" prop="classify">
-	            <el-select v-model="uploadForm.classify" placeholder="请选择图片分类">
-					    	<el-option v-for="(item, index) in classifyList" :key="index" :label="item.text" :value="item.value"></el-option>
-					    </el-select>
-	          </el-form-item>
-	          <el-form-item label="图片描述" prop="describe">
-	            <el-input type="textarea" v-model="uploadForm.describe"></el-input>
-	          </el-form-item>
-	        </el-form>
-	        <div style="text-align: right;">
-	        	<el-button size="medium" @click="dialogUploadVisible = false">取 消</el-button>
-    				<el-button size="medium" type="primary" @click="uploadfile">确 定</el-button>
-	        </div>
-				</el-dialog>
-      </div>
+			<div class="handle-box">
+				开始爬取页码：<el-input v-model="start" type="number" placeholder="爬取页数" class="handle-input mr10"></el-input>
+			</div>
+			
+			<div class="handle-box">
+				截止爬取页码：<el-input v-model="crawlPage" type="number" placeholder="爬取页数" class="handle-input mr10"></el-input>
+			</div>
+			
+			<div class="handle-box">
+				每次爬取页数：<el-input v-model="everyPage" type="number" placeholder="爬取页数" class="handle-input mr10"></el-input>
+				<el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="autoCrawlBook()">自动爬取</el-button>
+			</div>
+			
+			<!-- <el-table :data="tableData" border class="table" header-cell-class-name="table-header" height="600">
+				<el-table-column prop="bookId" label="bookId" align="center"></el-table-column>
+				<el-table-column prop="bookName" label="书名" align="center" min-width="150"></el-table-column>
+				<el-table-column prop="bookAuthor" label="作者" align="center" min-width="150"></el-table-column>
+				<el-table-column prop="bookType" label="书籍分类" align="center" :formatter="formatterType"></el-table-column>
+				<el-table-column prop="lastChapter" label="最新章节" align="center" min-width="180"></el-table-column>
+				<el-table-column prop="isSerial" label="状态" align="center" :formatter="formatterType"></el-table-column>
+				<el-table-column prop="source" label="书源" align="center"></el-table-column>
+			</el-table> -->
+			
+			<div style="text-align: center; margin-top: 20px;">{{crawlResult}}</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import VueCropper from 'vue-cropperjs'
-import { formatDate } from '@/utils/commonFunction.js'
-import { mapGetters } from 'vuex'
+import { getPages, searchBook, crawlBookTosql, crawlDetailsTosql } from '../../api/index.js'
+import { typeObj, stateObj } from '../../utils/bookUtil.js'
 export default {
 	name: 'upload',
-	data: function() {
+	data () {
 		return {
-			fileList: [], // 上传文件列表
-			dialogVisible: false, // 图片预览
-			dialogUploadVisible: false, // 上传图片框
-			dialogImageUrl: '', // 图片预览url
-      limit: 1, // 上传文件限制个数
-      classifyList: [], // 图片分类列表
-      uploadForm: {
-      	name: '',
-      	classify: '',
-      	describe: ''
-      },
-      uploadRules: {
-      	classify: [ { required: true, message: '请选择图片分类', trigger: 'change' } ]
-      }
+			tableData: [],
+			canCrawlPages: 0, // 可供爬取的页数
+			start: 1,
+			everyPage: 20, // 每次爬取20页
+			crawlPage: 20, // 爬取总页数
+			crawlResult: '' // 爬取结果
 		}
 	},
-	components: {
-		VueCropper
-	},
-	computed: {
-  	...mapGetters(['user'])
-  },
   mounted() {
-  	this.getClassify()
+		this.getPages();
 	},
 	methods: {
-		async getClassify() { // 获取图片分类
-			await this.$post(this.$api.getClassify).then(data => {
-    		if (data.code == 200) {
-    			this.classifyList = data.data.classifyList
-					this.$message.success(data.msg);
-				} else {
-					this.$message.error(data.msg);
-				}
-	    })
+		getPages () { // 获取可供爬取的页数
+			getPages().then(res => {
+				this.canCrawlPages = Number(res.data.allPages);
+			})
 		},
-		handleRemove(file, fileList) { // 删除图片
-      console.log(file, fileList)
-    },
-    handlePictureCardPreview(file) { // 图片预览
-      this.dialogImageUrl = file.url
-      this.dialogVisible = true;
-    },
-    handleExceed() { // 上传文件超过限制个数
-    	console.log('上传文件超过限制个数')
-    },
-    handleChange(file, fileList) { // 文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用
-    	this.fileList = fileList
-    	console.log(file, fileList)
-    },
-    uploadFile() { // 打开图片信息填写弹出框
-    	if (this.fileList.length == 0) {
-    		this.$message.error('请选择要上传的图片')
-    	} else {
-    		this.dialogUploadVisible = true
-    	}
-    },
-    uploadfile() { // 弹出框确认按钮
-   		this.$refs.uploadForm.validate((valid) => {
-        if (valid) {
-        	this.dialogUploadVisible = false
-        	this.submitImage()
-        } else {
-          this.$message.error('请输入完整表单信息')
-          return false
-        }
-      })
-    },
-    async submitImage() { // 上传图片接口
-    	let formDate = new FormData()
-    	formDate.append("file", this.fileList[0].raw);
-    	formDate.append("name", this.uploadForm.name);
-    	formDate.append("describe", this.uploadForm.describe);
-    	formDate.append("classify", this.uploadForm.classify);
-    	formDate.append("userName", this.user.userName);
-    	formDate.append("userId", this.user.userId);
-    	formDate.append("time", formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'));
-    	await this.$post(this.$api.imageUpload, formDate).then(data => {
-    		if (data.code == 200) {
-					this.$message.success(data.msg);
-				} else {
-					this.$message.error(data.msg);
+		
+		autoCrawlBook () { // 自动爬取书籍
+			this.crawlBookList().then(res => { // 先爬取书籍列表
+				this.tableData = [...this.tableData, ...res.data.saveResult];
+				this.crawlResult = `已成功爬取${this.tableData.length}本书籍！`;
+				if (Number(this.crawlPage) > (Number(this.start) + Number(this.everyPage))) {
+					this.start = Number(this.start) + Number(this.everyPage);
+					this.autoCrawlBook();
 				}
-	    })
-    }
+			}).catch(err => {
+				this.$message.error(err.msg);
+			})
+		},
+		
+		crawlBookList (startPage, endPage) { // 爬取书籍列表
+			return new Promise((resolve, reject) => {
+				crawlBookTosql({
+					start: Number(this.start),
+					end: Number(this.start) + Number(this.everyPage)
+				}).then(res => {
+					if (res.status == 200) {
+						resolve(res);
+					} else {
+						reject(res)
+					}
+				})
+			})
+		},
+		
+		crawlBookDetails () {
+			return new Promise((resolve, reject) => {
+				crawlDetailsTosql({
+					
+				}).then(res => {
+					
+				})
+			})
+		},
+		
+		handleSizeChange () {
+		},
+		
+		handlePageChange () {
+		},
+		
+		formatterType (row, column) { // 书籍类型转换
+			if (column.property == 'bookType') {
+				return typeObj[row[column.property]]
+			} else {
+				return stateObj[row[column.property]]
+			}
+		},
 	}
 }
 </script>
 
 <style scoped>
-	.imageform{
-		flex: 1;
-		min-width: 450px;
-		max-width: 600px;
+	.handle-box{
+		margin-bottom: 20px;
 	}
-
-	.unloaddiv{
-		margin: 40px 0;
-		min-width: 450px;
-		max-width: 700px;
-	}
-
-	.content-title {
-		font-weight: 400;
-		line-height: 50px;
-		margin: 10px 0;
-		font-size: 22px;
-		color: #1f2f3d;
-	}
-
-	.pre-img {
-		width: 100px;
-		height: 100px;
-		background: #f8f8f8;
-		border: 1px solid #eee;
-		border-radius: 5px;
-	}
-
-	.crop-demo {
-		display: flex;
-		align-items: flex-end;
-	}
-
-	.crop-demo-btn {
-		position: relative;
-		width: 100px;
-		height: 40px;
-		line-height: 40px;
-		padding: 0 20px;
-		margin-left: 30px;
-		background-color: #409eff;
-		color: #fff;
-		font-size: 14px;
-		border-radius: 4px;
-		box-sizing: border-box;
-	}
-
-	.crop-input {
-		position: absolute;
-		width: 100px;
-		height: 40px;
-		left: 0;
-		top: 0;
-		opacity: 0;
-		cursor: pointer;
+	.handle-input {
+		width: 300px;
+		display: inline-block;
 	}
 </style>
 

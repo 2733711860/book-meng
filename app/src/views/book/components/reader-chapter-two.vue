@@ -64,9 +64,13 @@ export default {
 		},
 		
 		setScroll () { // 当前章节始终在中间位置
-			if ($(".icondeng").offset().top > document.body.clientHeight/2) {
-				let scrollHeight = $(".icondeng").offset().top - document.body.clientHeight/2
-				$(".menu-content").scrollTop(scrollHeight)
+			if (this.showMenu) {
+				if ($(".icondeng").offset().top > (document.body.clientHeight/2 + 30)) {
+					let scrollHeight = $(".icondeng").offset().top - document.body.clientHeight/2
+					$(".menu-content").scrollTop(scrollHeight)
+				}
+			} else {
+				$(".menu-content").scrollTop(0)
 			}
 		}
 	}

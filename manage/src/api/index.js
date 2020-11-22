@@ -6,9 +6,11 @@
  */
 import { get, post } from './http.js'
 
-// export const baseUrl = `http://121.41.79.10:8080/api`
-export const baseUrl = `http://localhost:8080/api`
+export const baseUrl = `http://121.41.79.10:8080/api`
+// export const baseUrl = `http://localhost:8080/api`
 // export const baseUrl = 'https://www.fastmock.site/mock/f5b0436d25760cd9e4b88fdf3de4d459/api'
+
+export const getPages = params => get(`${baseUrl}/crawl/pages`, params) // 获取可供爬取的页数
 
 export const searchBook = params => get(`${baseUrl}/search/book`, params) // 多条件查询
 
