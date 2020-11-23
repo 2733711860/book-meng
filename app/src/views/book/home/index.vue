@@ -105,60 +105,50 @@ export default {
 	
 	methods: {
 		getYouLike () { // 猜你喜欢，默认起点月票榜
-			this.$loading.show()
 			getBookByRandom({
 				bookNum: 3, // 随机获取的数量
 				bookType: '1'
 			}).then(res => {
-				this.$loading.hide()
 				this.likeBooks = res.data.list
 			})
 		},
 		
 		getMailHots () { // 男频热榜，默认男频人气榜
-			this.$loading.show()
 			getBookByRank({
 				page: 1,
 				pageSize: 3,
 				rankType: 'BR1'
 			}).then(res => {
-				this.$loading.hide()
 				this.maleHots = res.data.list
 			})
 		},
 		
 		getFemaleHots () { // 女频热榜，默认女频人气榜
-			this.$loading.show()
 			getBookByRank({
 				page: 1,
 				pageSize: 3,
 				rankType: 'GR1'
 			}).then(res => {
-				this.$loading.hide()
 				this.femaleHots = res.data.list
 			})
 		},
 		
 		getNewBooks () { // 新书榜，默认连载榜
-			this.$loading.show()
 			getBookByRank({
 				page: 1,
 				pageSize: 3,
 				rankType: 'BR5'
 			}).then(res => {
-				this.$loading.hide()
 				this.newBooks = res.data.list
 			})
 		},
 		
 		getEndBooks () { // 完结榜，默认完结榜
-			this.$loading.show()
 			getBookByRank({
 				page: 1,
 				pageSize: 3,
 				rankType: 'BR6'
 			}).then(res => {
-				this.$loading.hide()
 				this.endBooks = res.data.list
 			})
 		},

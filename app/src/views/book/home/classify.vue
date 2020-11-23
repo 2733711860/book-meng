@@ -46,13 +46,11 @@ export default {
 	
 	methods: {
 		getBook () {
-			this.$loading.show()
 			getBookByType({
 				page: this.page,
 				pageSize: this.pageSize,
 				bookType: this.typeList[this.active].value
 			}).then(res => {
-				this.$loading.hide()
 				this.bookList = [...this.bookList, ...res.data.list]
 				this.loading = false
 				if (this.bookList.length == res.data.total) { // 数据全部加载完成

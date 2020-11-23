@@ -11,15 +11,6 @@ import "amfe-flexible";
 
 import './assets/Iconfont/css/iconfont.css'
 
-// 接口请求
-import {post,get,patch,put} from './api/http.js'
-// import api from './api'
-Vue.prototype.$post=post;
-Vue.prototype.$get=get;
-Vue.prototype.$patch=patch;
-Vue.prototype.$put=put;
-// Vue.prototype.$api=api;
-
 import store from './store'; // vuex
 
 import VueTouch from 'vue-touch'
@@ -29,9 +20,6 @@ VueTouch.config.swipe = {
 }
 
 Vue.config.productionTip = false;
-
-import Loading from './components/me-loading'
-Vue.use(Loading)
 
 new Vue({
   store,

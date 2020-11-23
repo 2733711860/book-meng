@@ -97,18 +97,15 @@ export default {
 			if (this.link != '') {
 				let links = []
 				links.push(this.link)
-				this.$loading.show()
 				getBookDetail({
 					source: this.chooseNet.value,
 					links: links
 				}).then(res => {
-					this.$loading.hide()
 					this.crawlBooks = res.data.books
 					if (this.crawlBooks.length == 0) {
 						Toast('未找到相关书籍')
 					}
 				}).catch(e => {
-					this.$loading.hide()
 					Toast('链接超时，请填写正确的书籍链接')
 				})
 			}

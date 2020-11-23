@@ -63,9 +63,7 @@ export default {
 	
 	methods: {
 		getHotWord () { // 获取热搜列表
-			this.$loading.show()
 			getHotWord().then(res => {
-				this.$loading.hide()
 				this.hotList = res.data.list
 			})
 		},
@@ -80,13 +78,11 @@ export default {
 		
 		getSearchs () { // 搜索接口
 			this.$store.dispatch('setHistory', this.searchKey) // 保存搜索历史
-			this.$loading.show()
 			getBookByWord({
 				keyWord: this.searchKey == '' ? '元尊' : this.searchKey,
 				page: this.page,
 				pageSize: this.pageSize
 			}).then(res => {
-				this.$loading.hide()
 				this.searchResult = [...this.searchResult, ...res.data.list]
 				this.loading = false
 				if (this.searchResult.length == res.data.total) { // 数据全部加载完成

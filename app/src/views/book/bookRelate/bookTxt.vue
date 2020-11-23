@@ -146,20 +146,16 @@ export default {
 					currentChapterIndex: this.currentIndex
 				})
 			} else { // 本章没有缓存
-				this.$loading.show()
 				getContent({
 					bookId: this.$route.query.bookId,
 					chapterId: this.thisBook.chapters[this.currentIndex].chapterId
 				}).then(res => {
-					this.$loading.hide()
 					if (res.status == 1001) { // 暂无本章信息，则调用爬取接口
-						this.$loading.show()
 						getBookContent({
 							source: this.thisBook.source,
 							bookId: this.$route.query.bookId,
 							chapterId: this.thisBook.chapters[this.currentIndex].chapterId
 						}).then(res => {
-							this.$loading.hide()
 							if (res.data.cpContent) {
 								this.bookContent = _nromalBook(res.data.title, res.data.cpContent)
 							} else {

@@ -169,12 +169,10 @@ export default {
 	
 	methods: {
 		getChapters () { // 调接口获取目录
-			this.$loading.show()
 			getBookChapter({
 				bookId: this.bookDetail.bookId,
 				source: this.bookDetail.source
 			}).then(res => {
-				this.$loading.hide()
 				if (res.status == 1001) { // 数据库没有这本书的章节信息，则调用爬取接口
 					this.crawlChapter()
 				} else if (res.status == 200) {
@@ -188,12 +186,10 @@ export default {
 		},
 		
 		crawlChapter () { // 通过爬取获取章节信息
-			this.$loading.show()
 			getCrawlChapter({
 				bookId: this.bookDetail.bookId,
 				source: this.bookDetail.source
 			}).then(res => {
-				this.$loading.hide()
 				if (res.status == 200) {
 					this.$store.dispatch('setCacheBooks', { // 保存书籍信息
 						bookId: this.bookDetail.bookId,
