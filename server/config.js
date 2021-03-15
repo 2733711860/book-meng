@@ -1,6 +1,7 @@
 module.exports = {
   sqlCongif: {
-    host: '121.41.79.10',
+    // host: '121.41.79.10',
+    host: '0.0.0.0',
     user: 'root',
     port: '3306',
     database: 'book',
@@ -8,7 +9,8 @@ module.exports = {
     connectionLimit: 50 // 最大连接数
   },
   listenPort: 8080,
-  listenHost: 'localhost',
+  // listenHost: 'localhost',
+  listenHost: '0.0.0.0',
   // 用户密码加密字符串
   PWD_ENCODE_STR: "pawn_user_encode_str",
   // token 加密字符串,撒盐：加密的时候混淆

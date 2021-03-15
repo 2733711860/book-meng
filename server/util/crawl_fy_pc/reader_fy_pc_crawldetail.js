@@ -105,7 +105,7 @@ function getDetail(url, callback) { // 获取小说详情
           let str = $(".bookinfo .panel-intro .infos").text();
           oneBook.wordCount = Number(str.slice(str.indexOf('(共') + 2, str.indexOf('万字)'))) * 10000; // 书籍字数
           let str2 = $(".bookinfo .panel-intro .infos").children(".item:last-child").text();
-          oneBook.updatedTime = str2.slice(str2.indexOf("(更新时间：") + 6, str2.length - 1); // 更新时间
+          oneBook.updatedTime = '2021-03-04'; // 更新时间
           oneBook.lastChapter = $(".bookinfo .panel-intro .infos").children(".item:last-child").find("a").text(); // 最新章节
           oneBook.bookType = typeObj[$(".crumbs .fl").children("a:last-child").text()];
           oneBook.detailUrl = url; // 详情页链接
